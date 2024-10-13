@@ -7,6 +7,12 @@ import adminRouter from './routes/adminRoute.js'
 
 //app config
 const app = express()
+   // Example to set timeout for the route
+   app.use((req, res, next) => {
+    req.setTimeout(500000); // Increase to a higher value if necessary
+    next();
+ });
+
 const port = process.env.PORT || 4000
 connectDB()
 connectCloudinary()
