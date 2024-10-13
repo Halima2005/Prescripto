@@ -1,6 +1,5 @@
 import React, { useContext, useEffect } from 'react'
 import { AdminContext } from '../../context/AdminContext.jsx'
-
 const DoctorList = () => {
 
 const {doctors,aToken, getAllDoctors} = useContext(AdminContext)
