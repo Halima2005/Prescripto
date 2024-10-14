@@ -8,7 +8,9 @@ export default {
     extend: {},
     colors:{
       'primary':"#5F6FFF",
-      'white':"#FFFFFF"
+      'white':"#FFFFFF",
+      'dark-faded-white': 'rgba(255, 255, 255, 0.4)',
+      'indigo-50':'#EEF2FF'
     }
   },
   plugins: [],
