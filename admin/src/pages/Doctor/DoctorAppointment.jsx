@@ -1,34 +1,38 @@
 import React, { useContext, useEffect } from "react";
-import { assets } from "../../assets/assets";
-import { AdminContext } from "../../context/AdminContext";
-import { AppContext } from "../../context/AppContext";
+import { assets } from "../../assets/assets.js";
+import { AppContext } from "../../context/AppContext.jsx";
+import { DoctorContext } from "../../context/DoctorContext.jsx";
 
-const AllApointment = () => {
-  const { aToken, appointments, getAllAppointments, cancelAppointment } =
-    useContext(AdminContext);
+const DoctorAppointment = () => {
+  const {
+    dToken,
+    appointments,
+    getAppointments,
+    cancelAppointment,
+    completeAppointment,
+  } = useContext(DoctorContext);
 
   const { calculateAge, slotDateFormat, currency } = useContext(AppContext);
 
   useEffect(() => {
-    getAllAppointments();
-  }, [aToken]);
-
+    if (dToken) getAppointments();
+  }, [dToken]);
   return (
     <div className="w-full max-w-6xl m-5">
-      <p className="mb-3 text-lg font-medium">All Appointments </p>
+      <p className="mb-3 text-lg font-medium"> All Appointments</p>
 
       <div className="bg-white border border-[#DADADA] rounded text-sm max-h-[80vh] min-h-[60vh] overflow-y-scroll">
         <div className="hidden sm:grid grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] grid-flow-col py-3 px-6 border border-[#DADADA]">
           <p>#</p>
           <p>Patient</p>
+          <p>Payment</p>
           <p>Age</p>
           <p>Date & Time</p>
-          <p>Doctors</p>
           <p>Fees</p>
-          <p>Actions</p>
+          <p>Action</p>
         </div>
 
-        {appointments.map((item, index) => (
+        {appointments.reverse().map((item, index) => (
           <div
             className="flex flex-wrap justify-between max-sm:gap-2 sm:grid sm:grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] items-center text-gray-500 py-3 px-6 border border-[#DADADA] hover:bg-gray-500"
             key={index}
@@ -42,33 +46,42 @@ const AllApointment = () => {
               />{" "}
               <p>{item.userData.name}</p>
             </div>
+            <div>
+              <p className="text-xs inline border border-primary px-2 rounded-full">
+                {item.payment ? "Online" : "Cash"}
+              </p>
+            </div>
+
             <p className="max-sm:hidden">{calculateAge(item.userData.dob)}</p>
             <p>
               {slotDateFormat(item.slotDate)},{item.slotTime}
             </p>
-            <div className="flex items-center gap-2">
-              <img
-                className="w-8 rounded-full bg-gray-200"
-                src={item.docData.image}
-                alt=""
-              />{" "}
-              <p>{item.docData.name}</p>
-            </div>
+
             <p>
               {currency}
               {item.amount}
             </p>
+
             {item.cancelled ? (
               <p className="text-red-400 text-xs font-medium">Cancelled</p>
             ) : item.isCompleted ? (
               <p className="text-green-400 text-xs font-medium">Completed</p>
             ) : (
-              <img
-                onClick={() => cancelAppointment(item._id)}
-                className="w-10 cursor-pointer"
-                src={assets.cancel_icon}
-                alt=""
-              />
+              <div className="flex">
+                <img
+                  onClick={() => cancelAppointment(item._id)}
+                  className="w-10 cursor-pointer"
+                  src={assets.cancel_icon}
+                  alt=""
+                />
+
+                <img
+                  onClick={() => completeAppointment(item._id)}
+                  className="w-10 cursor-pointer"
+                  src={assets.tick_icon}
+                  alt=""
+                />
+              </div>
             )}
           </div>
         ))}
@@ -77,4 +90,4 @@ const AllApointment = () => {
   );
 };
 
-export default AllApointment;
+export default DoctorAppointment;
