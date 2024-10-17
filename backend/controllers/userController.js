@@ -254,9 +254,7 @@ const paymentStripepay = async (req, res) => {
       const { appointmentId } = req.body;
       const appointmentData = await appointmentModel.findById(appointmentId);
   
-      if (!appointmentData || appointmentData.cancelled) {
-        return res.json({ success: false, message: "Appointment not found or cancelled" });
-      }
+      
   
       const doctorData = await doctorModel.findById(appointmentData.docId);
   
@@ -287,6 +285,7 @@ const paymentStripepay = async (req, res) => {
       
       // Send session URL to frontend
       res.json({ success: true, session_url: session.url });
+      console.log(appointmentId);
   
     } catch (error) {
       console.log(error);
@@ -296,43 +295,45 @@ const paymentStripepay = async (req, res) => {
   
 
 // API to verify payment
+// Assuming you are using Mongoose and have an Appointment model
+
+
+// API handler
+// Backend: Assuming you are using Express.js and MongoDB/Mongoose
+
+// Make sure this path is correct
+
 const verifyAppointmentPayment = async (req, res) => {
-    const { appointmentId, success } = req.body;
-  
-    console.log(`Received appointmentId: ${appointmentId}, success: ${success}`);
-  
-    if (!appointmentId || success === undefined) {
-      return res.json({ success: false, message: "Missing parameters in the request" });
-    }
-  
     try {
-      if (success === "true") {
-        // Payment was successful, update payment status
-        const appointment = await Appointment.findById(appointmentId);
+      const { appointmentId, success } = req.body; // Ensure these are correctly received
+  
+      if (!appointmentId || success === undefined) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+  
+      if (success === "true") {  // Ensure success is string type if passed in query params
+        // Update the payment status to true immediately after payment success
+        const appointment = await appointmentModel.findByIdAndUpdate(
+          appointmentId,
+          { payment: true },
+          { new: true } // Return the updated document
+        );
+  
         if (!appointment) {
-          return res.status(404).json({ success: false, message: "Appointment not found" });
-        }
-        
-        if (appointment.payment) {
-          return res.json({ success: true, message: "Payment already marked as successful" });
+          return res.status(404).json({ error: 'Appointment not found' });
         }
   
-        // Update the appointment's payment status and ensure it's not cancelled
-        appointment.payment = true;
-        appointment.cancelled = false;
-        await appointment.save();
-  
-        return res.json({ success: true, message: "Payment successful, appointment booked" });
+        return res.status(200).json({ message: 'Payment updated successfully', appointment });
       } else {
-        // If the payment failed, cancel the appointment
-        await appointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true });
-        return res.json({ success: false, message: "Payment failed, appointment cancelled" });
+        return res.status(400).json({ error: 'Payment failed' });
       }
     } catch (error) {
-      console.log(error);
-      return res.json({ success: false, message: "Error verifying payment" });
-    }
-};
+      console.error('Error verifying payment:', error);
+      return res.status(500).json({ error: 'Server error' });
+    } 
+  };
+  
+
 
   
 export { bookAppointment, cancelAppointment, getProfile, listAppointment, loginUser, paymentStripepay, registerUser, updateProfile, verifyAppointmentPayment }
