@@ -1,41 +1,37 @@
 import axios from 'axios';
-import { useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
-const VerifyPayment = () => {
+const Verify = () => {
+  const VITE_BACKEND_URL ='http://localhost:4001'
   const [searchParams] = useSearchParams();
+  const success = searchParams.get("success");
+  const orderId = searchParams.get("orderId");
   
-  const success = searchParams.get('success');  // Get 'success' param from URL
-  const appointmentId = searchParams.get('appointmentId');  // Get 'appointmentId' param from URL
-
-  useEffect(() => {
-    console.log(`Success param: ${success}, Appointment ID: ${appointmentId}`);  // Debug log
-
-    const verifyPayment = async () => {
-      if (appointmentId && success !== null) {
-        try {
-          const res = await axios.post('/api/verify-payment', {
-            appointmentId,
-            success,
-          });
-          
-          if (res.data.success) {
-            console.log('Payment verified, appointment booked.');
-          } else {
-            console.log('Payment failed or appointment cancelled.');
-          }
-        } catch (error) {
-          console.error('Error verifying payment:', error);
-        }
-      } else {
-        console.error("Missing success or appointmentId parameters.");
-      }
-    };
-
+  const navigate = useNavigate();
+  const verifyPayment = async () => {
+    const response = await axios.post(VITE_BACKEND_URL+"/api/user/verify-appointment-payment",{success,orderId});
+    if(response.data.success){
+        navigate("/my-appointment");
+    }
+    else{
+      navigate("/")
+    }
+  }
+  
+  useEffect(()=>{
     verifyPayment();
-  }, [appointmentId, success]);
+  },[])
 
-  return <div>Verifying Payment...</div>;
+
+
+
+  return (
+    <div className='verify'>
+      <div className='spinner'></div>
+     
+    </div>
+  );
 };
 
-export default VerifyPayment;
+export default Verify;

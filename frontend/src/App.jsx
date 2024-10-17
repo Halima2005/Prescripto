@@ -12,6 +12,7 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import MyAppointment from './pages/MyAppointment'
 import MyProfile from './pages/MyProfile'
+import VerifyPayment from './pages/verify'
 
 
 const App = () => {
@@ -29,7 +30,7 @@ const App = () => {
       <Route path='/my-profile' element={<MyProfile/>}/>
       <Route path='/my-appointment' element={<MyAppointment/>}/>
       <Route path='/appointment/:docId' element={<Appointment/>}/>
-
+      <Route path='/verifypayment/:appointmentId' element={<VerifyPayment/>}/>
       
     </Routes>
     <Footer/>
